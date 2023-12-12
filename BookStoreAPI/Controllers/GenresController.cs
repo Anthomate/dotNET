@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookStoreAPI.Entities;
+using BookStoreAPI.Models;
 
 namespace BookStoreAPI.Controllers
 {
@@ -33,49 +34,72 @@ namespace BookStoreAPI.Controllers
 
             if (genre == null)
             {
-                return NotFound();
+                return NotFound($"Genre avec l'ID {id} non trouvé.");
             }
 
             return Ok(genre);
         }
 
         [HttpPut("genres/{id}")]
-        public async Task<IActionResult> PutGenre(int id, Genre genre)
+        public async Task<IActionResult> PutGenre(int id, [FromBody] GenreDto genreDto)
         {
-            if (id != genre.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(genre).State = EntityState.Modified;
-
             try
             {
+                var existingGenre = await _context.Genres.FindAsync(id);
+
+                if (existingGenre == null)
+                {
+                    return NotFound($"Genre avec l'ID {id} non trouvé.");
+                }
+
+                existingGenre.Title = genreDto.Title;
+
                 await _context.SaveChangesAsync();
+                return Ok();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!GenreExists(id))
                 {
-                    return NotFound();
+                    return NotFound($"Genre avec l'ID {id} non trouvé.");
                 }
                 else
                 {
                     throw;
                 }
             }
-
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
+            }
         }
 
         [HttpPost("genres")]
-        public async Task<ActionResult<Genre>> PostGenre(Genre genre)
+        public async Task<ActionResult<Genre>> PostGenre([FromBody] GenreDto genreDto)
         {
-            _context.Genres.Add(genre);
-            await _context.SaveChangesAsync();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return CreatedAtAction("GetGenre", new { id = genre.Id }, genre);
+            try
+            {
+                var genre = new Genre
+                {
+                    Title = genreDto.Title
+                };
+
+                _context.Genres.Add(genre);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetGenre", new { id = genre.Id }, genre);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
+            }
         }
+
 
         [HttpDelete("genres/{id}")]
         public async Task<IActionResult> DeleteGenre(int id)
@@ -83,7 +107,7 @@ namespace BookStoreAPI.Controllers
             var genre = await _context.Genres.FindAsync(id);
             if (genre == null)
             {
-                return NotFound();
+                return NotFound($"Genre avec l'ID {id} non trouvé.");
             }
 
             _context.Genres.Remove(genre);

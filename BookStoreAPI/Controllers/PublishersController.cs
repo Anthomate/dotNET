@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookStoreAPI.Entities;
+using BookStoreAPI.Models;
 
 namespace BookStoreAPI.Controllers
 {
@@ -28,48 +29,70 @@ namespace BookStoreAPI.Controllers
 
             if (publisher == null)
             {
-                return NotFound();
+                return NotFound($"Editeur avec l'ID {id} non trouvé.");
             }
 
             return publisher;
         }
 
-        [HttpPut("publisher/{id}")]
-        public async Task<IActionResult> PutPublisher(int id, Publisher publisher)
+        [HttpPut("publishers/{id}")]
+        public async Task<IActionResult> PutPublisher(int id, [FromBody] PublisherDto publisherDto)
         {
-            if (id != publisher.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(publisher).State = EntityState.Modified;
-
             try
             {
+                var existingPublisher = await _context.Publishers.FindAsync(id);
+
+                if (existingPublisher == null)
+                {
+                    return NotFound($"Editeur avec l'ID {id} non trouvé.");
+                }
+
+                existingPublisher.Name = publisherDto.Name;
+
                 await _context.SaveChangesAsync();
+                return Ok();
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!PublisherExists(id))
                 {
-                    return NotFound();
+                    return NotFound($"Editeur avec l'ID {id} non trouvé.");
                 }
                 else
                 {
                     throw;
                 }
             }
-
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
+            }
         }
 
-        [HttpPost("publisher")]
-        public async Task<ActionResult<Publisher>> PostPublisher(Publisher publisher)
+        [HttpPost("publishers")]
+        public async Task<ActionResult<Publisher>> PostPublisher([FromBody] PublisherDto publisherDto)
         {
-            _context.Publishers.Add(publisher);
-            await _context.SaveChangesAsync();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return CreatedAtAction("GetPublisher", new { id = publisher.Id }, publisher);
+            try
+            {
+                var publisher = new Publisher
+                {
+                    Name = publisherDto.Name
+                };
+
+                _context.Publishers.Add(publisher);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetPublisher", new { id = publisher.Id }, publisher);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
+            }
         }
 
         [HttpDelete("publisher/{id}")]
@@ -78,7 +101,7 @@ namespace BookStoreAPI.Controllers
             var publisher = await _context.Publishers.FindAsync(id);
             if (publisher == null)
             {
-                return NotFound();
+                return NotFound($"Editeur avec l'ID {id} non trouvé.");
             }
 
             _context.Publishers.Remove(publisher);
