@@ -1,4 +1,5 @@
-﻿using BookStoreAPI.Data;
+﻿using AutoMapper;
+using BookStoreAPI.Data;
 using BookStoreAPI.Entities.BookEntities;
 using BookStoreAPI.Models.Dto.AuthorDto;
 using Microsoft.AspNetCore.Mvc;
@@ -10,21 +11,31 @@ namespace BookStoreAPI.Controllers.BookControllers
     public class AuthorsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AuthorsController(ApplicationDbContext context)
+        public AuthorsController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet("author")]
-        public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
+        public async Task<ActionResult<IEnumerable<AuthorGetRequestDto>>> GetAuthors()
         {
-            var author = await _context.Authors.ToListAsync(); ;
-            return Ok(author);
+            var authors = await _context.Authors.ToListAsync(); ;
+
+            var authorsDto = new List<AuthorGetRequestDto>();
+
+            foreach (var author in authors)
+            {
+                authorsDto.Add(_mapper.Map<AuthorGetRequestDto>(author));
+            }
+
+            return Ok(authorsDto);
         }
 
         [HttpGet("author/{id}")]
-        public async Task<ActionResult<Author>> GetAuthor(int id)
+        public async Task<ActionResult<AuthorGetRequestDto>> GetAuthor(int id)
         {
             var author = await _context.Authors.FindAsync(id);
 
@@ -33,11 +44,13 @@ namespace BookStoreAPI.Controllers.BookControllers
                 return NotFound($"Auteur avec l'ID {id} non trouvé.");
             }
 
-            return Ok(author);
+            var authorDto = _mapper.Map<AuthorGetRequestDto>(author);
+
+            return Ok(authorDto);
         }
 
         [HttpPut("author/{id}")]
-        public async Task<IActionResult> PutAuthor(int id, [FromBody] PostAuthorDto authorDto)
+        public async Task<IActionResult> PutAuthor(int id, [FromBody] AuthorEditRequestDto authorDto)
         {
             try
             {
@@ -48,7 +61,7 @@ namespace BookStoreAPI.Controllers.BookControllers
                     return NotFound($"Auteur avec l'ID {id} non trouvé.");
                 }
 
-                existingAuthor.Name = authorDto.Name;
+                _mapper.Map(authorDto, existingAuthor);
 
                 await _context.SaveChangesAsync();
                 return Ok();
@@ -71,7 +84,7 @@ namespace BookStoreAPI.Controllers.BookControllers
         }
 
         [HttpPost("author")]
-        public async Task<ActionResult<Author>> PostAuthor([FromBody] PostAuthorDto authorDto)
+        public async Task<ActionResult<AuthorCreateRequestDto>> PostAuthor([FromBody] AuthorCreateRequestDto authorDto)
         {
             if (!ModelState.IsValid)
             {
@@ -80,15 +93,14 @@ namespace BookStoreAPI.Controllers.BookControllers
 
             try
             {
-                var author = new Author
-                {
-                    Name = authorDto.Name
-                };
+                var author = _mapper.Map<Author>(authorDto);
 
                 _context.Authors.Add(author);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetAuthors", new { id = author.Id }, author);
+                var authorRequestDto = _mapper.Map<AuthorCreateRequestDto>(author);
+
+                return CreatedAtAction("GetAuthors", new { id = author.Id }, authorRequestDto);
             }
             catch (Exception ex)
             {

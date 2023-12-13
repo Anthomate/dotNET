@@ -1,4 +1,5 @@
-﻿using BookStoreAPI.Data;
+﻿using AutoMapper;
+using BookStoreAPI.Data;
 using BookStoreAPI.Entities.BookEntities;
 using BookStoreAPI.Models.Dto.GenreDto;
 using Microsoft.AspNetCore.Mvc;
@@ -10,21 +11,31 @@ namespace BookStoreAPI.Controllers.BookControllers
     public class GenresController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public GenresController(ApplicationDbContext context)
+        public GenresController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet("genre")]
-        public async Task<ActionResult<IEnumerable<Genre>>> GetGenres()
+        public async Task<ActionResult<IEnumerable<GenreGetRequestDto>>> GetGenres()
         {
             var genres = await _context.Genres.ToListAsync(); ;
-            return Ok(genres);
+
+            var genresDto = new List<GenreGetRequestDto>();
+
+            foreach (var genre in genres)
+            {
+                genresDto.Add(_mapper.Map<GenreGetRequestDto>(genre));
+            }
+
+            return Ok(genresDto);
         }
 
         [HttpGet("genre/{id}")]
-        public async Task<ActionResult<Genre>> GetGenre(int id)
+        public async Task<ActionResult<GenreGetRequestDto>> GetGenre(int id)
         {
             var genre = await _context.Genres.FindAsync(id);
 
@@ -33,11 +44,13 @@ namespace BookStoreAPI.Controllers.BookControllers
                 return NotFound($"Genre avec l'ID {id} non trouvé.");
             }
 
-            return Ok(genre);
+            var genreDto = _mapper.Map<GenreGetRequestDto>(genre);
+
+            return Ok(genreDto);
         }
 
         [HttpPut("genre/{id}")]
-        public async Task<IActionResult> PutGenre(int id, [FromBody] PostGenreDto genreDto)
+        public async Task<IActionResult> PutGenre(int id, [FromBody] GenreEditRequestDto genreDto)
         {
             try
             {
@@ -48,7 +61,7 @@ namespace BookStoreAPI.Controllers.BookControllers
                     return NotFound($"Genre avec l'ID {id} non trouvé.");
                 }
 
-                existingGenre.Title = genreDto.Title;
+                _mapper.Map(genreDto, existingGenre);
 
                 await _context.SaveChangesAsync();
                 return Ok();
@@ -71,7 +84,7 @@ namespace BookStoreAPI.Controllers.BookControllers
         }
 
         [HttpPost("genre")]
-        public async Task<ActionResult<Genre>> PostGenre([FromBody] PostGenreDto genreDto)
+        public async Task<ActionResult<GenreCreateRequestDto>> PostGenre([FromBody] GenreCreateRequestDto genreDto)
         {
             if (!ModelState.IsValid)
             {
@@ -80,15 +93,14 @@ namespace BookStoreAPI.Controllers.BookControllers
 
             try
             {
-                var genre = new Genre
-                {
-                    Title = genreDto.Title
-                };
+                var genre = _mapper.Map<Genre>(genreDto);
 
                 _context.Genres.Add(genre);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetGenre", new { id = genre.Id }, genre);
+                var genreRequestDto = _mapper.Map<GenreCreateRequestDto>(genre);
+
+                return CreatedAtAction("GetGenre", new { id = genre.Id }, genreRequestDto);
             }
             catch (Exception ex)
             {
