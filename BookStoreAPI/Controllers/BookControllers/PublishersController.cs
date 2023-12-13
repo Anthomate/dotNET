@@ -36,7 +36,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return publisher;
         }
 
-        [HttpPut("publishers/{id}")]
+        [HttpPut("publisher/{id}")]
         public async Task<IActionResult> PutPublisher(int id, [FromBody] PostPublisherDto publisherDto)
         {
             try
@@ -70,7 +70,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
-        [HttpPost("publishers")]
+        [HttpPost("publisher")]
         public async Task<ActionResult<Publisher>> PostPublisher([FromBody] PostPublisherDto publisherDto)
         {
             if (!ModelState.IsValid)

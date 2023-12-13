@@ -70,7 +70,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
-        [HttpPost("authors")]
+        [HttpPost("author")]
         public async Task<ActionResult<Author>> PostAuthor([FromBody] PostAuthorDto authorDto)
         {
             if (!ModelState.IsValid)

@@ -1,4 +1,5 @@
-﻿using BookStoreAPI.Data;
+﻿using AutoMapper;
+using BookStoreAPI.Data;
 using BookStoreAPI.Entities.BookEntities;
 using BookStoreAPI.Models.Dto.BookDto;
 using Microsoft.AspNetCore.Mvc;
@@ -10,25 +11,30 @@ namespace BookStoreAPI.Controllers.BookControllers
     public class BookController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BookController(ApplicationDbContext context)
+        public BookController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        [HttpGet("books")]
-        public async Task<ActionResult<List<Book>>> GetBooks()
+        [HttpGet("book")]
+        public async Task<ActionResult<List<BookGetRequestDto>>> GetBooks()
         {
-            var books = await _context.Books
-                .Include(book => book.Author)
-                .Include(book => book.Publisher)
-                .Include(book => book.BookGenre)
-                .ToListAsync();
+            var books = await _context.Books.ToListAsync();
+
+            var booksDto = new List<BookGetRequestDto>();
+
+            foreach (var book in books)
+            {
+                booksDto.Add(_mapper.Map<BookGetRequestDto>(book));
+            }
 
             return Ok(books);
         }
 
-        [HttpGet("books/{id}")]
+        [HttpGet("book/{id}")]
         public async Task<ActionResult<Book>> GetBookByIdAsync(int id)
         {
             var book = await _context.Books
@@ -45,8 +51,8 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(book);
         }
 
-        [HttpPut("books/{id}")]
-        public async Task<IActionResult> PutBook(int id, [FromBody] PostBookDto bookDto)
+        [HttpPut("book/{id}")]
+        public async Task<IActionResult> PutBook(int id, [FromBody] BookCreateRequestDto bookDto)
         {
             try
             {
@@ -113,8 +119,8 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
-        [HttpPost("books")]
-        public async Task<ActionResult<Book>> PostBook([FromBody] PostBookDto bookDto)
+        [HttpPost("book")]
+        public async Task<ActionResult<Book>> PostBook([FromBody] BookCreateRequestDto bookDto)
         {
             if (!ModelState.IsValid)
             {
@@ -154,7 +160,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
-        [HttpDelete("books/{id}")]
+        [HttpDelete("book/{id}")]
         public async Task<ActionResult<Book>> DeleteBook(int id)
         {
             var book = await _context.Books.FindAsync(id);

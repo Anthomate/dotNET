@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreAPI.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<Client>
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -23,6 +23,5 @@ namespace BookStoreAPI.Data
         public DbSet<Author> Authors { get; set; } = default!;
         public DbSet<Publisher> Publishers { get; set; } = default!;
         public DbSet<Genre> Genres { get; set; } = default!;
-        public DbSet<Client> Clients { get; set; } = default!;
     }
 }

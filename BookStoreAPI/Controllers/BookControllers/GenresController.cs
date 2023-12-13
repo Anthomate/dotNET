@@ -16,14 +16,14 @@ namespace BookStoreAPI.Controllers.BookControllers
             _context = context;
         }
 
-        [HttpGet("genres")]
+        [HttpGet("genre")]
         public async Task<ActionResult<IEnumerable<Genre>>> GetGenres()
         {
             var genres = await _context.Genres.ToListAsync(); ;
             return Ok(genres);
         }
 
-        [HttpGet("genres/{id}")]
+        [HttpGet("genre/{id}")]
         public async Task<ActionResult<Genre>> GetGenre(int id)
         {
             var genre = await _context.Genres.FindAsync(id);
@@ -36,7 +36,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(genre);
         }
 
-        [HttpPut("genres/{id}")]
+        [HttpPut("genre/{id}")]
         public async Task<IActionResult> PutGenre(int id, [FromBody] PostGenreDto genreDto)
         {
             try
@@ -70,7 +70,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
-        [HttpPost("genres")]
+        [HttpPost("genre")]
         public async Task<ActionResult<Genre>> PostGenre([FromBody] PostGenreDto genreDto)
         {
             if (!ModelState.IsValid)
@@ -96,7 +96,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
-        [HttpDelete("genres/{id}")]
+        [HttpDelete("genre/{id}")]
         public async Task<IActionResult> DeleteGenre(int id)
         {
             var genre = await _context.Genres.FindAsync(id);
