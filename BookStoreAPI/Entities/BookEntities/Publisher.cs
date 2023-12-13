@@ -1,4 +1,4 @@
-﻿namespace BookStoreAPI.Entities
+﻿namespace BookStoreAPI.Entities.BookEntities
 {
     public class Publisher
     {

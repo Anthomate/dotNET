@@ -1,6 +1,8 @@
-﻿namespace BookStoreAPI.Entities
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace BookStoreAPI.Entities.ClientEntities
 {
-    public class Client
+    public class Client : IdentityUser
     {
         public int Id { get; set; }
         public string FirstName { get; set; }

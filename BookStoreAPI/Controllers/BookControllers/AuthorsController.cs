@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BookStoreAPI.Data;
+using BookStoreAPI.Entities.BookEntities;
+using BookStoreAPI.Models.Dto.AuthorDto;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BookStoreAPI.Entities;
-using BookStoreAPI.Models;
 
-namespace BookStoreAPI.Controllers
+namespace BookStoreAPI.Controllers.BookControllers
 {
     [ApiController]
     public class AuthorsController : ControllerBase
@@ -18,7 +19,7 @@ namespace BookStoreAPI.Controllers
         [HttpGet("author")]
         public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
         {
-            var author = await _context.Authors.ToListAsync(); ;            
+            var author = await _context.Authors.ToListAsync(); ;
             return Ok(author);
         }
 
@@ -36,7 +37,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPut("author/{id}")]
-        public async Task<IActionResult> PutAuthor(int id, [FromBody] AuthorDto authorDto)
+        public async Task<IActionResult> PutAuthor(int id, [FromBody] PostAuthorDto authorDto)
         {
             try
             {
@@ -70,7 +71,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPost("authors")]
-        public async Task<ActionResult<Author>> PostAuthor([FromBody] AuthorDto authorDto)
+        public async Task<ActionResult<Author>> PostAuthor([FromBody] PostAuthorDto authorDto)
         {
             if (!ModelState.IsValid)
             {

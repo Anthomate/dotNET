@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BookStoreAPI.Data;
+using BookStoreAPI.Entities.BookEntities;
+using BookStoreAPI.Models.Dto.BookDto;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BookStoreAPI.Entities;
-using BookStoreAPI.Models;
 
-namespace BookStoreAPI.Controllers
+namespace BookStoreAPI.Controllers.BookControllers
 {
     [ApiController]
     public class BookController : ControllerBase
@@ -45,7 +46,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPut("books/{id}")]
-        public async Task<IActionResult> PutBook(int id, [FromBody] BookDto bookDto)
+        public async Task<IActionResult> PutBook(int id, [FromBody] PostBookDto bookDto)
         {
             try
             {
@@ -113,7 +114,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPost("books")]
-        public async Task<ActionResult<Book>> PostBook([FromBody] BookDto bookDto)
+        public async Task<ActionResult<Book>> PostBook([FromBody] PostBookDto bookDto)
         {
             if (!ModelState.IsValid)
             {
@@ -152,7 +153,6 @@ namespace BookStoreAPI.Controllers
                 return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
             }
         }
-
 
         [HttpDelete("books/{id}")]
         public async Task<ActionResult<Book>> DeleteBook(int id)

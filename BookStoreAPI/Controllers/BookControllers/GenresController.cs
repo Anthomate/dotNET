@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using BookStoreAPI.Data;
+using BookStoreAPI.Entities.BookEntities;
+using BookStoreAPI.Models.Dto.GenreDto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BookStoreAPI.Entities;
-using BookStoreAPI.Models;
 
-namespace BookStoreAPI.Controllers
+namespace BookStoreAPI.Controllers.BookControllers
 {
     [ApiController]
     public class GenresController : ControllerBase
@@ -41,7 +37,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPut("genres/{id}")]
-        public async Task<IActionResult> PutGenre(int id, [FromBody] GenreDto genreDto)
+        public async Task<IActionResult> PutGenre(int id, [FromBody] PostGenreDto genreDto)
         {
             try
             {
@@ -75,7 +71,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPost("genres")]
-        public async Task<ActionResult<Genre>> PostGenre([FromBody] GenreDto genreDto)
+        public async Task<ActionResult<Genre>> PostGenre([FromBody] PostGenreDto genreDto)
         {
             if (!ModelState.IsValid)
             {
@@ -99,7 +95,6 @@ namespace BookStoreAPI.Controllers
                 return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
             }
         }
-
 
         [HttpDelete("genres/{id}")]
         public async Task<IActionResult> DeleteGenre(int id)

@@ -1,10 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BookStoreAPI.Entities.BookEntities;
+using BookStoreAPI.Entities.ClientEntities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-namespace BookStoreAPI.Entities
+namespace BookStoreAPI.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<Client>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -12,11 +17,12 @@ namespace BookStoreAPI.Entities
 
             var dbPath = Path.Combine(currentDir, "bookstore.db");
             optionsBuilder.UseSqlite($"Filename={dbPath}");
-
         }
+
         public DbSet<Book> Books { get; set; } = default!;
         public DbSet<Author> Authors { get; set; } = default!;
         public DbSet<Publisher> Publishers { get; set; } = default!;
         public DbSet<Genre> Genres { get; set; } = default!;
+        public DbSet<Client> Clients { get; set; } = default!;
     }
 }

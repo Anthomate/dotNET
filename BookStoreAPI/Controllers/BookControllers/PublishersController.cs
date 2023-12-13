@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BookStoreAPI.Data;
+using BookStoreAPI.Entities.BookEntities;
+using BookStoreAPI.Models.Dto.PublisherDto;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BookStoreAPI.Entities;
-using BookStoreAPI.Models;
 
-namespace BookStoreAPI.Controllers
+namespace BookStoreAPI.Controllers.BookControllers
 {
     [ApiController]
     public class PublishersController : ControllerBase
@@ -36,7 +37,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPut("publishers/{id}")]
-        public async Task<IActionResult> PutPublisher(int id, [FromBody] PublisherDto publisherDto)
+        public async Task<IActionResult> PutPublisher(int id, [FromBody] PostPublisherDto publisherDto)
         {
             try
             {
@@ -70,7 +71,7 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpPost("publishers")]
-        public async Task<ActionResult<Publisher>> PostPublisher([FromBody] PublisherDto publisherDto)
+        public async Task<ActionResult<Publisher>> PostPublisher([FromBody] PostPublisherDto publisherDto)
         {
             if (!ModelState.IsValid)
             {

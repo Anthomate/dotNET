@@ -1,18 +1,5 @@
-﻿namespace BookStoreAPI.Entities
+﻿namespace BookStoreAPI.Entities.BookEntities
 {
-    //public enum Genre
-    //{
-    //    Fiction = 0,
-    //    Mystery = 1,
-    //    Romance = 2,
-    //    ScienceFiction = 3,
-    //    Fantasy = 4,
-    //    NonFiction = 5,
-    //    Biography = 6,
-    //    History = 7,
-    //    Poetry = 8
-    //}
-
     public class Book
     {
         public int Id { get; set; }

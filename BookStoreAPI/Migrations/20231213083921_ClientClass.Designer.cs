@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStoreAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231212132832_AddAuthorPublisherGenreClass")]
-    partial class AddAuthorPublisherGenreClass
+    [Migration("20231213083921_ClientClass")]
+    partial class ClientClass
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,6 +73,37 @@ namespace BookStoreAPI.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books");
+                });
+
+            modelBuilder.Entity("BookStoreAPI.Entities.Client", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Client");
                 });
 
             modelBuilder.Entity("BookStoreAPI.Entities.Genre", b =>
