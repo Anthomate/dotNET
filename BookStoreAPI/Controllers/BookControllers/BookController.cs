@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BookStoreAPI.Controllers.BookControllers
 {
     [ApiController]
+    [Authorize]
     public class BookController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
