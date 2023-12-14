@@ -9,6 +9,6 @@
         public DateTime PublicationDate { get; set; }
         public double Price { get; set; }
         public string ISBN { get; set; } = default!;
-        public Genre BookGenre { get; set; }
+        public Genre BookGenre { get; set; } = default!;
     }
 }

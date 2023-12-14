@@ -22,25 +22,24 @@ namespace BookStoreAPI.Controllers.BookControllers
         [HttpGet("book")]
         public async Task<ActionResult<List<BookGetRequestDto>>> GetBooks()
         {
-            var books = await _context.Books.ToListAsync();
+            var books = await _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .Include(b => b.BookGenre)
+                .ToListAsync();
 
-            var booksDto = new List<BookGetRequestDto>();
+            var booksDto = books.Select(_mapper.Map<BookGetRequestDto>).ToList();
 
-            foreach (var book in books)
-            {
-                booksDto.Add(_mapper.Map<BookGetRequestDto>(book));
-            }
-
-            return Ok(books);
+            return Ok(booksDto);
         }
 
         [HttpGet("book/{id}")]
-        public async Task<ActionResult<Book>> GetBookByIdAsync(int id)
+        public async Task<ActionResult<BookGetRequestDto>> GetBookByIdAsync(int id)
         {
             var book = await _context.Books
-                .Include(book => book.Author)
-                .Include(book => book.Publisher)
-                .Include(book => book.BookGenre)
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .Include(b => b.BookGenre)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (book == null)
@@ -48,7 +47,9 @@ namespace BookStoreAPI.Controllers.BookControllers
                 return NotFound($"Livre avec l'ID {id} non trouvé.");
             }
 
-            return Ok(book);
+            var bookDto = _mapper.Map<BookGetRequestDto>(book);
+
+            return Ok(bookDto);
         }
 
         [HttpPut("book/{id}")]
@@ -56,21 +57,14 @@ namespace BookStoreAPI.Controllers.BookControllers
         {
             try
             {
-                var existingBook = await _context.Books
-                    .Include(b => b.Author)
-                    .Include(b => b.Publisher)
-                    .Include(b => b.BookGenre)
-                    .FirstOrDefaultAsync(b => b.Id == id);
+                var existingBook = await _context.Books.FindAsync(id);
 
                 if (existingBook == null)
                 {
                     return NotFound($"Livre avec l'ID {id} non trouvé.");
                 }
 
-                existingBook.Title = bookDto.Title;
-                existingBook.PublicationDate = bookDto.PublicationDate;
-                existingBook.Price = bookDto.Price;
-                existingBook.ISBN = bookDto.ISBN;
+                _mapper.Map(bookDto, existingBook);
 
                 if (bookDto.AuthorId != 0)
                 {
@@ -120,7 +114,7 @@ namespace BookStoreAPI.Controllers.BookControllers
         }
 
         [HttpPost("book")]
-        public async Task<ActionResult<Book>> PostBook([FromBody] BookCreateRequestDto bookDto)
+        public async Task<ActionResult<BookCreateRequestDto>> PostBook([FromBody] BookCreateRequestDto bookDto)
         {
             if (!ModelState.IsValid)
             {
@@ -129,36 +123,43 @@ namespace BookStoreAPI.Controllers.BookControllers
 
             try
             {
-                var author = await _context.Authors.FindAsync(bookDto.AuthorId);
-                var publisher = await _context.Publishers.FindAsync(bookDto.PublisherId);
-                var genre = await _context.Genres.FindAsync(bookDto.GenreId);
+                var existingAuthor = await _context.Authors.FindAsync(bookDto.AuthorId);
+                var existingGenre = await _context.Genres.FindAsync(bookDto.GenreId);
+                var existingPublisher = await _context.Publishers.FindAsync(bookDto.PublisherId);
 
-                if (author == null || publisher == null || genre == null)
+                if (existingAuthor == null)
                 {
-                    return NotFound("Une ou plusieurs entités référencées n'ont pas été trouvées");
+                    return NotFound($"Auteur avec l'ID {bookDto.AuthorId} non trouvé.");
+                }
+                if (existingGenre == null)
+                {
+                    return NotFound($"Genre avec l'ID {bookDto.GenreId} non trouvé.");
+                }
+                if (existingPublisher == null)
+                {
+                    return NotFound($"Editeur avec l'ID {bookDto.PublisherId} non trouvé.");
                 }
 
-                var book = new Book
-                {
-                    Title = bookDto.Title,
-                    Author = author,
-                    Publisher = publisher,
-                    PublicationDate = bookDto.PublicationDate,
-                    Price = bookDto.Price,
-                    ISBN = bookDto.ISBN,
-                    BookGenre = genre
-                };
+                var book = _mapper.Map<Book>(bookDto);
+
+                book.Author = existingAuthor ;
+                book.BookGenre = existingGenre;
+                book.Publisher = existingPublisher;
+
 
                 _context.Books.Add(book);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetBooks", new { id = book.Id }, book);
+                var bookRequestDto = _mapper.Map<BookCreateRequestDto>(book);
+
+                return CreatedAtAction("GetBooks", new { id = book.Id }, bookRequestDto);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
             }
         }
+
 
         [HttpDelete("book/{id}")]
         public async Task<ActionResult<Book>> DeleteBook(int id)
