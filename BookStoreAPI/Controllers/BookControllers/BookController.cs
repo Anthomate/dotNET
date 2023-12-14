@@ -2,6 +2,7 @@
 using BookStoreAPI.Data;
 using BookStoreAPI.Entities.BookEntities;
 using BookStoreAPI.Models.Dto.BookDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("book")]
         public async Task<ActionResult<List<BookGetRequestDto>>> GetBooks()
         {
@@ -33,6 +35,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(booksDto);
         }
 
+        [Authorize]
         [HttpGet("book/{id}")]
         public async Task<ActionResult<BookGetRequestDto>> GetBookByIdAsync(int id)
         {
@@ -52,6 +55,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(bookDto);
         }
 
+        [Authorize]
         [HttpPut("book/{id}")]
         public async Task<IActionResult> PutBook(int id, [FromBody] BookCreateRequestDto bookDto)
         {
@@ -113,6 +117,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
+        [Authorize]
         [HttpPost("book")]
         public async Task<ActionResult<BookCreateRequestDto>> PostBook([FromBody] BookCreateRequestDto bookDto)
         {
@@ -160,7 +165,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
-
+        [Authorize]
         [HttpDelete("book/{id}")]
         public async Task<ActionResult<Book>> DeleteBook(int id)
         {

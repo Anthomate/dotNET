@@ -2,6 +2,7 @@
 using BookStoreAPI.Data;
 using BookStoreAPI.Entities.BookEntities;
 using BookStoreAPI.Models.Dto.GenreDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("genre")]
         public async Task<ActionResult<IEnumerable<GenreGetRequestDto>>> GetGenres()
         {
@@ -34,6 +36,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(genresDto);
         }
 
+        [Authorize]
         [HttpGet("genre/{id}")]
         public async Task<ActionResult<GenreGetRequestDto>> GetGenre(int id)
         {
@@ -49,6 +52,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(genreDto);
         }
 
+        [Authorize]
         [HttpPut("genre/{id}")]
         public async Task<IActionResult> PutGenre(int id, [FromBody] GenreEditRequestDto genreDto)
         {
@@ -83,6 +87,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
+        [Authorize]
         [HttpPost("genre")]
         public async Task<ActionResult<GenreCreateRequestDto>> PostGenre([FromBody] GenreCreateRequestDto genreDto)
         {
@@ -108,6 +113,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
+        [Authorize]
         [HttpDelete("genre/{id}")]
         public async Task<IActionResult> DeleteGenre(int id)
         {

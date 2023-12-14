@@ -1,6 +1,4 @@
 ﻿using BookStoreAPI.Entities.BookEntities;
-using BookStoreAPI.Entities.ClientEntities;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreAPI.Data

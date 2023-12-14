@@ -2,6 +2,7 @@
 using BookStoreAPI.Data;
 using BookStoreAPI.Entities.BookEntities;
 using BookStoreAPI.Models.Dto.PublisherDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("publisher")]
         public async Task<ActionResult<IEnumerable<PublisherGetRequestDto>>> GetPublishers()
         {
@@ -33,6 +35,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(publishersDto);
         }
 
+        [Authorize]
         [HttpGet("publisher/{id}")]
         public async Task<ActionResult<PublisherGetRequestDto>> GetPublisher(int id)
         {
@@ -48,6 +51,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(publisherDto);
         }
 
+        [Authorize]
         [HttpPut("publisher/{id}")]
         public async Task<IActionResult> PutPublisher(int id, [FromBody] PublisherEditRequestDto publisherDto)
         {
@@ -82,6 +86,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
+        [Authorize]
         [HttpPost("publisher")]
         public async Task<ActionResult<PublisherCreateRequestDto>> PostPublisher([FromBody] PublisherCreateRequestDto publisherDto)
         {
@@ -107,6 +112,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
+        [Authorize]
         [HttpDelete("publisher/{id}")]
         public async Task<IActionResult> DeletePublisher(int id)
         {

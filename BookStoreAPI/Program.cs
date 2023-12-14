@@ -1,4 +1,8 @@
 using BookStoreAPI.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace BookStoreAPI
 {
@@ -15,7 +19,29 @@ namespace BookStoreAPI
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                });
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
+
+            var currentDir = Directory.GetCurrentDirectory();
+            var dbPath = Path.Combine(currentDir, "Bookstore.db");
+
+            builder.Services.AddDbContext<UserDbContext>(options =>
+            {
+                options.UseSqlite($"Filename={dbPath}");
+            });
+
+            builder.Services.AddAuthorization();
+
+            builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+                .AddEntityFrameworkStores<UserDbContext>();
 
             var app = builder.Build();
 
@@ -25,6 +51,8 @@ namespace BookStoreAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.MapIdentityApi<IdentityUser>();
 
             app.UseHttpsRedirection();
 

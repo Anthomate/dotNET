@@ -2,6 +2,7 @@
 using BookStoreAPI.Data;
 using BookStoreAPI.Entities.BookEntities;
 using BookStoreAPI.Models.Dto.AuthorDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("author")]
         public async Task<ActionResult<IEnumerable<AuthorGetRequestDto>>> GetAuthors()
         {
@@ -34,6 +36,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(authorsDto);
         }
 
+        [Authorize]
         [HttpGet("author/{id}")]
         public async Task<ActionResult<AuthorGetRequestDto>> GetAuthor(int id)
         {
@@ -49,6 +52,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             return Ok(authorDto);
         }
 
+        [Authorize]
         [HttpPut("author/{id}")]
         public async Task<IActionResult> PutAuthor(int id, [FromBody] AuthorEditRequestDto authorDto)
         {
@@ -83,6 +87,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
+        [Authorize]
         [HttpPost("author")]
         public async Task<ActionResult<AuthorCreateRequestDto>> PostAuthor([FromBody] AuthorCreateRequestDto authorDto)
         {
@@ -108,6 +113,7 @@ namespace BookStoreAPI.Controllers.BookControllers
             }
         }
 
+        [Authorize]
         [HttpDelete("author/{id}")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
